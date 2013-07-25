@@ -18,10 +18,11 @@ class rvm::passenger::apache::centos::post(
       require   => [Rvm_gem['passenger'], Package['httpd','httpd-devel','mod_ssl']];
   }
 
-  file {
-    '/etc/httpd/conf.d/passenger.conf':
-      ensure  => file,
-      content => template('rvm/passenger-apache-centos.conf.erb'),
+  exec{
+      'create /etc/httpd/conf.d/passenger.conf':
+      command => "${rvm::passenger::apache::binpath}rvm ${rvm::passenger::apache::ruby_version} exec passenger-install-apache2-module --snippet > /etc/httpd/conf.d/passenger.conf",
+      creates => '/etc/httpd/conf.d/passenger.conf',
+      logoutput => 'on_failure',
       require => Exec['passenger-install-apache2-module'];
   }
 }
